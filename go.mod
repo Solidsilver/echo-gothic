@@ -1,4 +1,4 @@
-module github.com/nabowler/echo-gothic
+module github.com/Solidsilver/echo-gothic
 
 go 1.15
 
