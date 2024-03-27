@@ -20,6 +20,7 @@ var keySet = false
 func init() {
 	key := []byte(os.Getenv("SESSION_SECRET"))
 	keySet = len(key) != 0
+    defaultStore = gothic.Store
 }
 
 /*
