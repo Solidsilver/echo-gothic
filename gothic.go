@@ -3,13 +3,24 @@ package echogothic
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"net/url"
+	"os"
 
+	"github.com/gorilla/sessions"
 	"github.com/labstack/echo/v4"
 	"github.com/markbates/goth"
 	"github.com/markbates/goth/gothic"
 )
+
+var defaultStore sessions.Store
+var keySet = false
+
+func init() {
+	key := []byte(os.Getenv("SESSION_SECRET"))
+	keySet = len(key) != 0
+}
 
 /*
 BeginAuthHandler is a convenience handler for starting the authentication process.
@@ -54,6 +65,9 @@ I would recommend using the BeginAuthHandler instead of doing all of these steps
 yourself, but that's entirely up to you.
 */
 func GetAuthURL(ectx echo.Context) (string, error) {
+	if !keySet && defaultStore == gothic.Store {
+		fmt.Println("goth/gothic: no SESSION_SECRET environment variable is set. The default cookie store is not available and any calls will fail. Ignore this warning if you are using a different store.")
+	}
 	providerName, err := GetProviderName(ectx)
 	if err != nil {
 		return "", err
@@ -90,6 +104,9 @@ It expects to be able to get the name of the provider from the query parameters
 as either "provider" or ":provider".
 */
 var CompleteUserAuth = func(ectx echo.Context) (goth.User, error) {
+    if !keySet && defaultStore == gothic.Store {
+		fmt.Println("goth/gothic: no SESSION_SECRET environment variable is set. The default cookie store is not available and any calls will fail. Ignore this warning if you are using a different store.")
+	}
 	defer func() {
 		// TODO: log?
 		_ = Logout(ectx)
